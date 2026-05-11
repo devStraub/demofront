@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { Header } from "./Header";
-import { Footer } from "./Footer";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 
 import {
   Box,
@@ -12,19 +12,23 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Divider,
 } from "@mui/material";
 
 import HomeIcon from "@mui/icons-material/Home";
 import ListIcon from "@mui/icons-material/List";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
-import { GlobalAlert } from "../../store/components/global/GlobalAlert";
-import { GlobalDialog } from "../../store/components//global/GlobalDialog";
+import { GlobalAlert } from "../shared/components/feedback/GlobalAlert";
+import { GlobalDialog } from "../shared/components/feedback/GlobalDialog";
 
 import { useDispatch } from "react-redux";
-import { showAlert } from "../../store/alertSlice";
-import { openDialog } from "../../store/dialogSlice";
+import { showAlert } from "../store/alertSlice";
+import { openDialog } from "../store/dialogSlice";
+
+import { useAuth } from "../features/auth/hooks/useAuth";
 
 export function MainLayout() {
   const [leftOpen, setLeftOpen] = useState(false);
@@ -34,10 +38,19 @@ export function MainLayout() {
   const location = useLocation();
 
   const dispatch = useDispatch();
+  const { logout, user } = useAuth();
 
   function handleNavigate(path: string) {
     navigate(path);
     setLeftOpen(false); // fecha o menu ao clicar
+  }
+
+  function handleLogout() {
+    logout();
+
+    navigate("/login");
+
+    setLeftOpen(false);
   }
 
   const menuItems = [
@@ -67,7 +80,7 @@ export function MainLayout() {
       {/* CONTEÚDO */}
       <Box sx={{ p: 2 }}><Outlet /></Box>
 
-      <Footer/>
+      <Footer />
 
       {/* SIDEBAR ESQUERDA */}
       <Drawer
@@ -78,7 +91,7 @@ export function MainLayout() {
         <Box
           sx={{
             width: 250,
-            height: "100vh", 
+            height: "100vh",
             display: "flex",
             flexDirection: "column",
           }}
@@ -86,6 +99,13 @@ export function MainLayout() {
           {/* Header do menu */}
           <Box sx={{ p: 2 }}>
             <Typography variant="h6">Menu</Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+            >
+              {user?.name}
+            </Typography>
           </Box>
 
           {/* Área rolável */}
@@ -110,6 +130,18 @@ export function MainLayout() {
               })}
             </List>
           </Box>
+
+          <Divider />
+
+          <List>
+            <ListItemButton onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </List>
         </Box>
       </Drawer>
 

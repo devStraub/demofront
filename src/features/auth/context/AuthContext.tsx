@@ -1,24 +1,58 @@
-import { createContext, useState, useEffect } from "react";
+import {
+    createContext,
+    useEffect,
+    useState,
+    ReactNode,
+} from "react";
 
 import { login } from "../services/authService";
-import { AuthUser } from "../types/authTypes";
+
+import {
+    AuthUser,
+    AuthResponse,
+} from "../types/authTypes";
 
 interface AuthContextData {
-    user: any;
     token: string | null;
-    signIn: (email: string, password: string) => Promise<void>;
+    user: AuthUser | null;
+
+    signIn: (
+        email: string,
+        password: string
+    ) => Promise<void>;
+
+    signInWithToken: (
+        data: AuthResponse
+    ) => void;
+
     logout: () => void;
+
+    isAuthenticated: boolean;
 }
 
-export const AuthContext = createContext({} as AuthContextData);
+interface AuthProviderProps {
+    children: ReactNode;
+}
 
-export const AuthProvider = ({ children }: any) => {
-    const [user, setUser] = useState<AuthUser | null>(null);
+export const AuthContext =
+    createContext({} as AuthContextData);
+
+export const AuthProvider = ({
+    children,
+}: AuthProviderProps) => {
+
     const [token, setToken] = useState<string | null>(null);
 
+    const [user, setUser] =
+        useState<AuthUser | null>(null);
+
+    // RECUPERA SESSÃO
     useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        const storedUser = localStorage.getItem("user");
+        const storedToken =
+            localStorage.getItem("token");
+
+        const storedUser =
+            localStorage.getItem("user");
 
         if (storedToken && storedUser) {
             setToken(storedToken);
@@ -26,13 +60,43 @@ export const AuthProvider = ({ children }: any) => {
         }
     }, []);
 
-    const signIn = async (email: string, password: string) => {
-        const data = await login(email, password);
+    const signInWithToken = (
+        data: AuthResponse
+    ) => {
 
-        localStorage.setItem("token", data.token);
+        const user = {
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            role: data.role,
+        };
+
+        localStorage.setItem(
+            "token",
+            data.token
+        );
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
 
         setToken(data.token);
-        setUser(data.user);
+
+        setUser(user);
+    };
+
+    const signIn = async (
+        email: string,
+        password: string
+    ) => {
+    
+        const data = await login(
+            email,
+            password
+        );
+    
+        signInWithToken(data);
     };
 
     const logout = () => {
@@ -44,7 +108,16 @@ export const AuthProvider = ({ children }: any) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, signIn, logout }}>
+        <AuthContext.Provider
+            value={{
+                token,
+                user,
+                signIn,
+                signInWithToken,
+                logout,
+                isAuthenticated: !!token,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

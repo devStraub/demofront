@@ -1,5 +1,11 @@
 import { AppBar, Toolbar, Box, Typography, IconButton } from "@mui/material";
+
 import MenuIcon from "@mui/icons-material/Menu";
+import LogoutIcon from "@mui/icons-material/Logout";
+import AppsIcon from "@mui/icons-material/Apps";
+
+import { useAuth } from "../../features/auth/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   onLeftClick?: () => void;
@@ -7,6 +13,16 @@ type Props = {
 };
 
 export function Header({ onLeftClick, onRightClick }: Props) {
+  const { logout } = useAuth();
+
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+
+    navigate("/login");
+  }
+
   return (
     <AppBar position="fixed">
       <Toolbar
@@ -28,9 +44,28 @@ export function Header({ onLeftClick, onRightClick }: Props) {
         </Box>
 
         {/* Direita */}
-        <Box sx={{ minWidth: 48, display: "flex", justifyContent: "flex-end" }}>
-          <IconButton color="inherit" onClick={onRightClick}>
-            <MenuIcon />
+        <Box
+          sx={{
+            minWidth: 96,
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1,
+          }}
+        >
+          {/* UTILITÁRIOS */}
+          <IconButton
+            color="inherit"
+            onClick={onRightClick}
+          >
+            <AppsIcon />
+          </IconButton>
+
+          {/* LOGOUT */}
+          <IconButton
+            color="inherit"
+            onClick={handleLogout}
+          >
+            <LogoutIcon />
           </IconButton>
         </Box>
       </Toolbar>

@@ -5,6 +5,7 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import { theme } from "./theme/theme";
 import { Provider } from "react-redux";
 import { store } from "./store";
+import { AuthProvider } from "./features/auth/context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -12,7 +13,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <CssBaseline />
 
       <Provider store={store}>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </Provider>
     </ThemeProvider>
   </React.StrictMode>

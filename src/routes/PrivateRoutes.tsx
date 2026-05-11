@@ -1,7 +1,7 @@
 import { Route } from "react-router-dom";
 import { PrivateRoute } from "../features/auth/components/PrivateRoute";
-import { MainLayout } from "../components/layout/MainLayout";
-import { HomePage } from "../pages/home/HomePage";
+import { MainLayout } from "../layouts/MainLayout";
+import { HomePage } from "../features/home/pages/HomePage";
 
 
 // páginas
